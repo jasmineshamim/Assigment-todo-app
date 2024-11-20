@@ -11,9 +11,16 @@ const TodoList = () => {
   const [currentTaskIndex, setCurrentTaskIndex] = useState<number | null>(null);
   const [celebrationVisible, setCelebrationVisible] = useState(false);
 
+  const TASK_LIMIT = 1000;  // Set the task limit to 1000
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (task.trim() === '') return;
+
+    if (tasks.length >= TASK_LIMIT) {
+      alert('Task limit reached! You can only add up to 1000 tasks.');
+      return;
+    }
 
     if (editing && currentTaskIndex !== null) {
       const updatedTasks = [...tasks];
@@ -66,7 +73,7 @@ const TodoList = () => {
             <div className="progressBar mt-4 w-full bg-[#A64D79] rounded-full h-2">
               <div
                 className="progress bg-[#FFCCEA] h-full rounded-2xl"
-                style={{ width: `${(tasks.length / 1000) * 1000}%` }}
+                style={{ width: `${(tasks.length / TASK_LIMIT) * 100}%` }}  // Update progress bar according to task limit
               />
             </div>
           </div>
