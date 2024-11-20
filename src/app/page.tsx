@@ -39,15 +39,16 @@ const TodoList = () => {
     setTasks(updatedTasks);
   };
 
+  const handleContinue = () => {
+    setCelebrationVisible(false);
+  };
+
+  // Trigger celebration when 5 tasks are added
   useEffect(() => {
     if (tasks.length === 5) {
       setCelebrationVisible(true);
     }
-  }, [tasks.length]);
-
-  const handleContinue = () => {
-    setCelebrationVisible(false);
-  };
+  }, [tasks]);
 
   return (
     <>
@@ -65,12 +66,12 @@ const TodoList = () => {
             <div className="progressBar mt-4 w-full bg-[#A64D79] rounded-full h-2">
               <div
                 className="progress bg-[#FFCCEA] h-full rounded-2xl"
-                style={{ width: `${(tasks.length / 5) * 100}%` }}
-              ></div>
+                style={{ width: `${(tasks.length / 100) * 100}%` }}
+              />
             </div>
           </div>
           <div className="stats-number mt-4">
-            <p className="text-3xl font-bold font-[Spartan] text-white">{tasks.length} / 5</p>
+            <p className="text-3xl font-bold font-[Spartan] text-white">{tasks.length} Tasks</p>
           </div>
         </div>
 
@@ -87,12 +88,12 @@ const TodoList = () => {
             type="submit"
             className="bg-gradient-to-r from-[#3B1C32] via-[#6A1E55] to-[#A64D79] text-white py-2 px-6 rounded-lg font-[Spartan] font-semibold transition-transform duration-200 hover:scale-105"
           >
-            {editing ? 'Update Task' : 'Add Task'}
+            {editing ? 'Update' : 'Add'}
           </button>
         </form>
 
         {/* Task List */}
-        <ul className="task-list mt-4 w-11/12 max-w-md text-left rounded-lg p-4 shadow-md bg-gradient-to-r from-[#6A1E55]  to-[#A64D79] text-white ">
+        <ul className="task-list mt-4 mb-4 w-11/12 max-w-md text-left rounded-lg p-4 shadow-md bg-gradient-to-r from-[#6A1E55]  to-[#A64D79] text-white overflow-y-auto max-h-96">
           {tasks.map((task, index) => (
             <li key={index} className="mb-2 p-2 border-b border-[#3B1C32] flex justify-between items-center">
               <span>{task}</span>
@@ -121,7 +122,7 @@ const TodoList = () => {
             <Confetti />
             <div className="bg-gradient-to-r from-[#A64D79]  to-[#6A1E55] p-6 rounded-lg shadow-lg text-center">
               <h2 className="text-3xl font-bold text-white">🎉 Congratulations! 🎉</h2>
-              <p className="text-white mt-2">Your completed 5 tasks. Keep up the great work!</p>
+              <p className="text-white mt-2">You completed 5 tasks. Keep up the great work!</p>
               <button
                 onClick={handleContinue}
                 className="mt-4 px-6 py-2 bg-[#6A1E55] text-white rounded-lg font-semibold transition-transform duration-200 hover:bg-[#A64D79] hover:scale-105"
@@ -138,3 +139,4 @@ const TodoList = () => {
 };
 
 export default TodoList;
+
