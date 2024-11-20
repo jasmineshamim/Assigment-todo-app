@@ -66,7 +66,7 @@ const TodoList = () => {
             <div className="progressBar mt-4 w-full bg-[#A64D79] rounded-full h-2">
               <div
                 className="progress bg-[#FFCCEA] h-full rounded-2xl"
-                style={{ width: `${(tasks.length / 100) * 100}%` }}
+                style={{ width: `${(tasks.length / 1000) * 1000}%` }}
               />
             </div>
           </div>
