@@ -1,35 +1,33 @@
 'use client';
-import Footer from '@/component/Footer';
 import React, { useState, useEffect } from 'react';
+import Footer from '@/component/Footer';
 import Confetti from 'react-confetti';
 import { MdEdit, MdDeleteForever } from "react-icons/md";
 
+interface Task {
+  text: string;
+  completed: boolean;
+}
+
 const TodoList = () => {
   const [task, setTask] = useState('');
-  const [tasks, setTasks] = useState<string[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [editing, setEditing] = useState(false);
   const [currentTaskIndex, setCurrentTaskIndex] = useState<number | null>(null);
   const [celebrationVisible, setCelebrationVisible] = useState(false);
-
-  const TASK_LIMIT = 1000;  // Set the task limit to 1000
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (task.trim() === '') return;
 
-    if (tasks.length >= TASK_LIMIT) {
-      alert('Task limit reached! You can only add up to 1000 tasks.');
-      return;
-    }
-
     if (editing && currentTaskIndex !== null) {
       const updatedTasks = [...tasks];
-      updatedTasks[currentTaskIndex] = task;
+      updatedTasks[currentTaskIndex] = { ...updatedTasks[currentTaskIndex], text: task };
       setTasks(updatedTasks);
       setEditing(false);
       setCurrentTaskIndex(null);
     } else {
-      setTasks([...tasks, task]);
+      setTasks([...tasks, { text: task, completed: false }]);
     }
 
     setTask('');
@@ -38,7 +36,7 @@ const TodoList = () => {
   const handleEdit = (index: number) => {
     setEditing(true);
     setCurrentTaskIndex(index);
-    setTask(tasks[index]);
+    setTask(tasks[index].text);
   };
 
   const handleDelete = (index: number) => {
@@ -46,40 +44,53 @@ const TodoList = () => {
     setTasks(updatedTasks);
   };
 
+  const handleToggleComplete = (index: number) => {
+    const updatedTasks = [...tasks];
+    updatedTasks[index].completed = !updatedTasks[index].completed;
+    setTasks(updatedTasks);
+  };
+
   const handleContinue = () => {
     setCelebrationVisible(false);
   };
 
-  // Trigger celebration when 5 tasks are added
+  // Trigger celebration when all tasks are completed
   useEffect(() => {
-    if (tasks.length === 5) {
+    if (tasks.length > 0 && tasks.every(task => task.completed)) {
       setCelebrationVisible(true);
     }
   }, [tasks]);
 
   return (
     <>
-      <div className="bg-gradient-to-r from-[#A64D79]  to-[#FFCCEA] text-black h-screen flex flex-col items-center justify-start pt-12">
-        <h1 className="text-3xl font-bold font-[Spartan] text-white pb-3 -mt-4 text-center items-center">
+      <div className="bg-[#D1A7E5] text-black min-h-screen flex flex-col items-center justify-start pt-12">
+        <h1 className="text-3xl font-bold font-[Spartan] text-white pb-3 -mt-4 text-center">
           Assignment by Jasmine Sheikh
         </h1>
 
         {/* Card Container */}
-        <div className="p-4 border-2 border-[#A64D79] rounded-2xl bg-gradient-to-r from-[#6A1E55]  to-[#6A1E55] shadow-md flex flex-col items-center w-11/12 max-w-md">
-          <div className="details text-center">
+        <div className="p-4 border-2 border-[#A64D79] rounded-2xl bg-gradient-to-r from-[#1C1C1C]  to-[#7D3C98] shadow-md flex flex-col items-center w-11/12 max-w-md">
+          <div className="text-center">
             <h1 className="text-4xl font-[Spartan] font-bold mb-4 text-white">ToDo Application</h1>
-            <p className="text-base font-semibold text-font-[Spartan] text-white">Great job, keep going!</p>
+            <p className="text-base font-semibold text-white">Great job, keep going!</p>
+
             {/* Progress Bar */}
             <div className="progressBar mt-4 w-full bg-[#A64D79] rounded-full h-2">
               <div
-                className="progress bg-[#FFCCEA] h-full rounded-2xl"
-                style={{ width: `${(tasks.length / TASK_LIMIT) * 100}%` }}  // Update progress bar according to task limit
+                className="progress bg-[#D1A7E5] h-full rounded-2xl"
+                style={{
+                  width: `${Math.min(
+                    (tasks.filter(task => task.completed).length / tasks.length) * 100,
+                    100
+                  )}%`,
+                }}
               />
             </div>
           </div>
-          <div className="stats-number mt-4">
-            <p className="text-3xl font-bold font-[Spartan] text-white">{tasks.length} Tasks</p>
-          </div>
+          <p className="text-3xl font-bold font-[Spartan] text-white mt-4">
+            {tasks.filter(task => task.completed).length}/{tasks.length} 
+            {tasks.some(task => task.completed) && ' Completed'}
+          </p>
         </div>
 
         {/* Form Section */}
@@ -93,48 +104,72 @@ const TodoList = () => {
           />
           <button
             type="submit"
-            className="bg-gradient-to-r from-[#3B1C32] via-[#6A1E55] to-[#A64D79] text-white py-2 px-6 rounded-lg font-[Spartan] font-semibold transition-transform duration-200 hover:scale-105"
+            className="bg-gradient-to-r from-[#1C1C1C]  to-[#7D3C98] text-white py-2 px-3 rounded-lg font-[Spartan] font-semibold transition-transform duration-200 hover:scale-105"
           >
-            {editing ? 'Update' : 'Add'}
+            {editing ? 'Task Update' : 'Task Add'}
           </button>
         </form>
 
         {/* Task List */}
-        <ul className="task-list mt-4 mb-4 w-11/12 max-w-md text-left rounded-lg p-4 shadow-md bg-gradient-to-r from-[#6A1E55]  to-[#A64D79] text-white overflow-y-auto max-h-96">
-          {tasks.map((task, index) => (
-            <li key={index} className="mb-2 p-2 border-b border-[#3B1C32] flex justify-between items-center">
-              <span>{task}</span>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleEdit(index)}
-                  className="text-blue-500 hover:underline"
-                >
-                  <MdEdit />
-                </button>
-                <button
-                  onClick={() => handleDelete(index)}
-                  className="text-red-500 hover:underline"
-                >
-                  <MdDeleteForever />
-                </button>
-              </div>
-            </li>
-          ))}
-          {tasks.length === 0 && <p className="text-white">No tasks yet. Add one!</p>}
+        <ul className="task-list mt-4 w-11/12 max-w-md text-left rounded-lg p-4 shadow-md bg-gradient-to-r from-[#1C1C1C]  to-[#7D3C98] text-white mb-4">
+          {tasks.length > 0 ? (
+            tasks.map((task, index) => (
+              <li
+                key={index}
+                className="flex justify-between items-center bg-[#D1A7E5] rounded-lg px-4 py-3 mb-2 text-black"
+              >
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() => handleToggleComplete(index)}
+                    className="h-4 w-4"
+                  />
+                  <span
+                    className={`${
+                      task.completed ? 'line-through text-gray-400' : ''
+                    }`}
+                  >
+                    {task.text}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(index)}
+                    aria-label="Edit task"
+                    className="text-blue-500 hover:scale-110"
+                  >
+                    <MdEdit />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(index)}
+                    aria-label="Delete task"
+                    className="text-red-500 hover:scale-110"
+                  >
+                    <MdDeleteForever />
+                  </button>
+                </div>
+              </li>
+            ))
+          ) : (
+            <p className="text-center text-white">No tasks yet. Add one!</p>
+          )}
         </ul>
 
         {/* Celebration Section */}
         {celebrationVisible && (
           <div className="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50">
             <Confetti />
-            <div className="bg-gradient-to-r from-[#A64D79]  to-[#6A1E55] p-6 rounded-lg shadow-lg text-center">
+            <div className="bg-gradient-to-r from-[#1C1C1C]  to-[#7D3C98] p-6 rounded-lg shadow-lg text-center">
               <h2 className="text-3xl font-bold text-white">🎉 Congratulations! 🎉</h2>
-              <p className="text-white mt-2">You completed 5 tasks. Keep up the great work!</p>
+              <p className="text-white mt-2">
+                You've completed all your tasks. Keep up the great work!
+              </p>
               <button
                 onClick={handleContinue}
-                className="mt-4 px-6 py-2 bg-[#6A1E55] text-white rounded-lg font-semibold transition-transform duration-200 hover:bg-[#A64D79] hover:scale-105"
+                className="mt-4 px-6 py-2 bg-[#7D3C98] text-white rounded-lg font-semibold transition-transform duration-200 hover:bg-[#D1A7E5] hover:scale-105"
               >
-                Stop!
+                Close
               </button>
             </div>
           </div>
@@ -146,4 +181,5 @@ const TodoList = () => {
 };
 
 export default TodoList;
+
 
