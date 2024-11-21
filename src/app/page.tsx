@@ -104,7 +104,7 @@ const TodoList = () => {
           />
           <button
             type="submit"
-            className="bg-gradient-to-r from-[#1C1C1C]  to-[#7D3C98] text-white py-2 px-6 rounded-lg font-[Spartan] font-semibold transition-transform duration-200 hover:scale-105"
+            className="bg-gradient-to-r from-[#1C1C1C]  to-[#7D3C98] text-white py-2 px-3 rounded-lg font-[Spartan] font-semibold transition-transform duration-200 hover:scale-105"
           >
             {editing ? 'Update' : 'Add'}
           </button>
